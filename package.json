@@ -1,0 +1,52 @@
+{
+  "name": "forge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "bin": {
+    "create-bp": "dist/main.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "tsx src/main.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Keanred/forge.git"
+  },
+  "keywords": [],
+  "author": "Anssi Keinanen",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/Keanred/forge/issues"
+  },
+  "homepage": "https://github.com/Keanred/forge#readme",
+  "dependencies": {
+    "chalk": "^5",
+    "commander": "^13",
+    "fs-extra": "^11",
+    "inquirer": "^12",
+    "ora": "^8"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11",
+    "@types/node": "^25.5.0",
+    "@typescript-eslint/parser": "^8.57.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-prettier": "^5",
+    "jiti": "^2",
+    "prettier": "^3.8.1",
+    "prettier-eslint": "^16.4.2",
+    "prettier-plugin-organize-imports": "^4",
+    "ts-node": "^10",
+    "tsx": "^4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8"
+  }
+}
