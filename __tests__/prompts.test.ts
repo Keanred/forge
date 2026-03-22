@@ -1,14 +1,14 @@
-
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { promptUser } from '../src/prompts';
 import inquirer from 'inquirer';
 import { ProjectConfig } from '../src/types';
 
-jest.mock('inquirer');
-const mockedPrompt = inquirer.prompt as unknown as jest.Mock;
+vi.mock('inquirer');
+const mockedPrompt = vi.mocked(inquirer.prompt);
 
 describe('promptUser', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should prompt for all fields if no defaults', async () => {

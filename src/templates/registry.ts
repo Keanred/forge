@@ -1,6 +1,7 @@
 type TemplateOption = 'typescript' | 'testing' | 'packageManager' | 'git';
 
 type TemplateMeta = {
+  id: string;
   name: string;
   description: string;
   dirPath: string;
@@ -11,6 +12,7 @@ export const getTemplates = (template: string): TemplateMeta => {
   switch (template) {
     case 'express':
       return {
+        id: 'express',
         name: 'Express',
         description: 'A minimal and flexible Node.js web application framework.',
         dirPath: 'express',
@@ -18,6 +20,7 @@ export const getTemplates = (template: string): TemplateMeta => {
       };
     case 'react':
       return {
+        id: 'react',
         name: 'React',
         description: 'A JavaScript library for building user interfaces.',
         dirPath: 'react',
@@ -25,6 +28,7 @@ export const getTemplates = (template: string): TemplateMeta => {
       };
     case 'express-react':
       return {
+        id: 'express-react',
         name: 'Express + React',
         description: 'A full-stack template combining Express and React.',
         dirPath: 'express-react',
