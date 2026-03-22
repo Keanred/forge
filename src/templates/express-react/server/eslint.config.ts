@@ -3,7 +3,7 @@ import prettier from 'eslint-plugin-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['**/*.js', 'node_modules', 'dist', 'src/templates']),
+  globalIgnores(['**/*.js', 'node_modules', 'dist']),
   {
     files: ['**/*.ts', '**/*.tsx'],
     plugins: {
@@ -14,7 +14,6 @@ export default defineConfig([
       parserOptions: {
         project: './tsconfig.json',
         sourceType: 'module',
-        tsconfigRootDir: __dirname,
       },
       globals: {
         NodeJS: true,

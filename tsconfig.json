@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "target": "esnext",
     "module": "esnext",
     "outDir": "./dist",
@@ -15,5 +15,5 @@
     "src/**/*.mts",
     "src/**/*.cts"
   ],
-  "exclude": ["node_modules", "dist", "templates"]
+  "exclude": ["node_modules", "dist", "src/templates"]
 }
