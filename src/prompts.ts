@@ -1,49 +1,70 @@
 import inquirer from 'inquirer';
 import { ProjectConfig } from './types';
 
-export const promptUser = async (defaults: Partial<ProjectConfig>) => {
+const toBool = (value: unknown, fallback: boolean): boolean => (typeof value === 'boolean' ? value : fallback);
+
+export const promptUser = async (defaults: any) => {
+  const mappedDefaults: Partial<ProjectConfig> = {
+    name: defaults.name,
+    template: defaults.template,
+    typescript: typeof defaults.typescript === 'boolean' ? defaults.typescript : undefined,
+    testing: typeof defaults.testing === 'boolean' ? defaults.testing : undefined,
+    packageManager: defaults.packageManager || defaults.pm,
+    git: typeof defaults.git === 'boolean' ? defaults.git : undefined,
+  };
+
   const answers = await inquirer.prompt([
     {
       type: 'input',
       name: 'name',
       message: 'Project name:',
-      when: () => !defaults.name,
-      default: defaults.name || 'my-project',
+      when: () => !mappedDefaults.name,
+      default: 'my-project',
     },
     {
       type: 'list',
       name: 'template',
       message: 'Project template:',
-      when: () => !defaults.template,
+      when: () => !mappedDefaults.template,
       choices: ['react', 'express', 'fullstack'],
-      default: defaults.template || 'express',
+      default: 'express',
     },
     {
-      type: 'list',
+      type: 'confirm',
       name: 'typescript',
       message: 'Use typescript?',
-      when: () => !defaults.typescript,
-      choices: ['Yes', 'No'],
-      transformer: (input: string) => {
-        return input === 'Yes' ? true : false;
-      },
-      default: defaults.typescript || 'Yes',
+      when: () => mappedDefaults.typescript === undefined,
+      default: true,
+    },
+    {
+      type: 'confirm',
+      name: 'testing',
+      message: 'Include testing setup?',
+      when: () => mappedDefaults.testing === undefined,
+      default: false,
     },
     {
       type: 'list',
       name: 'packageManager',
       message: 'Package manager:',
-      when: () => !defaults.packageManager,
+      when: () => !mappedDefaults.packageManager,
       choices: ['npm', 'yarn', 'pnpm'],
-      default: defaults.packageManager || 'npm',
+      default: 'npm',
     },
     {
       type: 'confirm',
       name: 'git',
-      when: () => !defaults.git,
+      when: () => mappedDefaults.git === undefined,
       message: 'Initialize git repository?',
-      default: defaults.git || true,
+      default: true,
     },
   ]);
-  return answers;
+
+  return {
+    ...mappedDefaults,
+    ...answers,
+    typescript: toBool(answers.typescript ?? mappedDefaults.typescript, true),
+    testing: toBool(answers.testing ?? mappedDefaults.testing, false),
+    git: toBool(answers.git ?? mappedDefaults.git, true),
+  };
 };

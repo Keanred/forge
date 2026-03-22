@@ -1,14 +1,15 @@
 import fs from 'fs-extra';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ProjectConfig } from 'types';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export const resolvePath = async (projectName?: string) => {
-  if (!projectName) throw new Error('Project name is required');
+export const resolvePath = async (projectConfig: ProjectConfig) => {
+  if (!projectConfig.name) throw new Error('Project name is required');
 
   const templateDir = path.resolve(__dirname, 'templates/express-react');
-  const destDir = path.resolve(process.cwd(), projectName);
+  const destDir = path.resolve(process.cwd(), projectConfig.name);
 
   if (templateDir === destDir) {
     throw new Error('Template and destination directories must not be the same.');
@@ -28,7 +29,7 @@ export const resolvePath = async (projectName?: string) => {
   const pkgPath = path.join(destDir, 'package.json');
   if (await fs.pathExists(pkgTemplatePath)) {
     let pkgContent = await fs.readFile(pkgTemplatePath, 'utf8');
-    pkgContent = pkgContent.replace(/\{\{project-name\}\}/g, projectName);
+    pkgContent = pkgContent.replace(/\{\{project-name\}\}/g, projectConfig.name);
     await fs.writeFile(pkgPath, pkgContent, 'utf8');
   }
 };

@@ -5,6 +5,7 @@ export interface ProjectConfig {
   name: string;
   template: Template;
   typescript: boolean;
+  testing: boolean;
   packageManager: PackageManager;
   git: boolean;
 }
