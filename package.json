@@ -4,11 +4,12 @@
   "description": "",
   "main": "dist/main.js",
   "bin": {
-    "create-bp": "dist/main.js"
+    "forge": "dist/main.js"
   },
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "postbuild": "node scripts/copy-templates.js",
     "start": "node dist/main.js",
     "dev": "tsx src/main.ts",
     "lint": "eslint .",

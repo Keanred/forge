@@ -1,11 +1,21 @@
 import fs from 'fs-extra';
-import { cwd } from 'node:process';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// ESM-compatible __dirname
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export const resolvePath = async (projectName?: string) => {
-  const path = cwd();
-  const templatePath = fileURLToPath(new URL(path, import.meta.url));
-  await fs.copy(templatePath, process.cwd(), {
+  if (!projectName) throw new Error('Project name is required');
+
+  const templateDir = path.resolve(__dirname, 'templates/express-react');
+  const destDir = path.resolve(process.cwd(), projectName);
+
+  if (templateDir === destDir) {
+    throw new Error('Template and destination directories must not be the same.');
+  }
+
+  await fs.copy(templateDir, destDir, {
     overwrite: false,
     filter: (src) => {
       if (src.includes('node_modules') || src.includes('.git')) {
@@ -15,12 +25,10 @@ export const resolvePath = async (projectName?: string) => {
     },
   });
 
-  if (projectName) {
-    const pkgPath = `${process.cwd()}/package.json`;
-    if (await fs.pathExists(pkgPath)) {
-      let pkgContent = await fs.readFile(pkgPath, 'utf8');
-      pkgContent = pkgContent.replace(/\{\{project-name\}\}/g, projectName);
-      await fs.writeFile(pkgPath, pkgContent, 'utf8');
-    }
+  const pkgPath = path.join(destDir, 'package.json');
+  if (await fs.pathExists(pkgPath)) {
+    let pkgContent = await fs.readFile(pkgPath, 'utf8');
+    pkgContent = pkgContent.replace(/\{\{project-name\}\}/g, projectName);
+    await fs.writeFile(pkgPath, pkgContent, 'utf8');
   }
 };

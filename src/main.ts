@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { initGit } from './post-scaffold.js';
 import { resolvePath } from './scaffold.js';
+import { validateProjectName } from './utils/validate.js';
 
 const program = new Command();
 
@@ -12,8 +13,11 @@ const main = async () => {
     .command('init <projectName>')
     .description('Initialize a new Forge project')
     .action(async (projectName: string) => {
+      await validateProjectName(projectName);
       await resolvePath(projectName);
-      await initGit();
+      const path = (await import('node:path')).default;
+      const destDir = path.resolve(process.cwd(), projectName);
+      await initGit(destDir);
     });
 
   await program.parseAsync(process.argv);
