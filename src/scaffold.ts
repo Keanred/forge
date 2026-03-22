@@ -3,6 +3,9 @@ import { glob } from 'glob';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ProjectConfig } from 'types';
+import { generatePackageJson } from './generators/package-json.js';
+import { generateReadme } from './generators/readme.js';
+import { buildContext, renderTemplate } from './template-engine.js';
 import { listTemplates } from './templates/registry.js';
 import { vitestExpress, vitestReact } from './vitest.js';
 
@@ -30,47 +33,19 @@ export const resolvePath = async (projectConfig: ProjectConfig) => {
     },
   });
 
-  // If testing enabled: add vitest config, test directory, and test dependencies
+  // If testing enabled: write vitest config and create test directories
   if (projectConfig.testing) {
     const template = projectConfig.template.toLowerCase();
     const vitestConfigPath = path.join(destDir, 'vitest.config.ts');
-    const packageJsonPath = path.join(destDir, 'package.json');
-    const packageJson = await fs.readJSON(packageJsonPath);
 
     if (template === 'react') {
       await fs.writeFile(vitestConfigPath, vitestReact, 'utf8');
-      packageJson.devDependencies = {
-        ...packageJson.devDependencies,
-        vitest: '^3.0.8',
-        jsdom: '^26.0.0',
-        '@testing-library/react': '^16.2.0',
-        '@testing-library/jest-dom': '^6.6.3',
-        '@testing-library/user-event': '^14.6.1',
-      };
-      packageJson.scripts = {
-        ...packageJson.scripts,
-        test: 'vitest run',
-        'test:watch': 'vitest',
-      };
       await fs.ensureDir(path.join(destDir, 'src', 'test'));
       await fs.writeFile(path.join(destDir, 'src', 'test', 'setup.ts'), "import '@testing-library/jest-dom';", 'utf8');
     } else if (template === 'express') {
       await fs.writeFile(vitestConfigPath, vitestExpress, 'utf8');
-      packageJson.devDependencies = {
-        ...packageJson.devDependencies,
-        vitest: '^3.0.8',
-        supertest: '^7.0.0',
-        '@types/supertest': '^6.0.2',
-      };
-      packageJson.scripts = {
-        ...packageJson.scripts,
-        test: 'vitest run',
-        'test:watch': 'vitest',
-      };
       await fs.ensureDir(path.join(destDir, 'tests'));
     }
-
-    await fs.writeJSON(packageJsonPath, packageJson, { spaces: 2 });
   }
 
   // If typescript is disabled: remove tsconfig.json and swap eslint config to JS version
@@ -99,13 +74,22 @@ export const resolvePath = async (projectConfig: ProjectConfig) => {
     }
   }
 
-  // Process package.json.template: substitute {{project-name}} and create package.json
-  const pkgTemplatePath = path.join(destDir, 'package.json.template');
-  const pkgPath = path.join(destDir, 'package.json');
-  if (await fs.pathExists(pkgTemplatePath)) {
-    let pkgContent = await fs.readFile(pkgTemplatePath, 'utf8');
-    pkgContent = pkgContent.replace(/\{\{project-name\}\}/g, projectConfig.name);
-    await fs.writeFile(pkgPath, pkgContent, 'utf8');
-    await fs.remove(pkgTemplatePath);
+  // Apply template engine to any .template files copied from the template directory
+  const context = buildContext(projectConfig);
+  const templateFiles = await glob('**/*.template', { cwd: destDir, absolute: true });
+  for (const file of templateFiles) {
+    const content = await fs.readFile(file, 'utf8');
+    const rendered = renderTemplate(content, context);
+    const destFile = file.replace(/\.template$/, '');
+    await fs.writeFile(destFile, rendered, 'utf8');
+    await fs.remove(file);
   }
+
+  // Write package.json using the generator (overrides any template-rendered version)
+  const packageJson = generatePackageJson(projectConfig);
+  await fs.writeJSON(path.join(destDir, 'package.json'), packageJson, { spaces: 2 });
+
+  // Write README.md
+  const readme = generateReadme(projectConfig);
+  await fs.writeFile(path.join(destDir, 'README.md'), readme, 'utf8');
 };

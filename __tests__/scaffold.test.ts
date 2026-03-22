@@ -56,18 +56,14 @@ describe('Scaffold Engine', () => {
     expect(filterFn('/path/src/main.ts')).toBe(true);
   });
 
-  it('should process package.json.template', async () => {
-    vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
-    vi.mocked(fs.readFile).mockResolvedValueOnce('{"name": "{{project-name}}"}');
-
+  it('should write package.json using the generator', async () => {
     await resolvePath(mockConfig);
 
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(fs.writeJSON).toHaveBeenCalledWith(
       expect.stringContaining('package.json'),
-      '{"name": "test-app"}',
-      'utf8',
+      expect.objectContaining({ name: 'test-app' }),
+      expect.any(Object),
     );
-    expect(fs.remove).toHaveBeenCalledWith(expect.stringContaining('package.json.template'));
   });
 
   it('should add testing dependencies when testing enabled', async () => {

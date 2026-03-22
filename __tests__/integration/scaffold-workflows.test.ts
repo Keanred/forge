@@ -9,7 +9,7 @@ vi.mock('glob');
 
 describe('Scaffold Workflows (Integration)', () => {
   const setupMocks = () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     vi.mocked(fs.pathExists).mockResolvedValue(false);
     vi.mocked(fs.copy).mockResolvedValue(undefined);
     vi.mocked(fs.readJSON).mockResolvedValue({
@@ -125,8 +125,7 @@ describe('Scaffold Workflows (Integration)', () => {
       vi.mocked(fs.pathExists)
         .mockResolvedValueOnce(true)  // tsconfig.json exists
         .mockResolvedValueOnce(true)  // eslint.config.ts exists
-        .mockResolvedValueOnce(false) // eslint.config.js doesn't exist
-        .mockResolvedValueOnce(false); // package.json.template doesn't exist
+        .mockResolvedValueOnce(false); // eslint.config.js doesn't exist
 
       const config: ProjectConfig = {
         name: 'js-api',
@@ -167,8 +166,7 @@ describe('Scaffold Workflows (Integration)', () => {
       vi.mocked(fs.pathExists)
         .mockResolvedValueOnce(true)  // tsconfig.json exists
         .mockResolvedValueOnce(true)  // eslint.config.ts exists
-        .mockResolvedValueOnce(true)  // eslint.config.js exists (React template has this)
-        .mockResolvedValueOnce(false); // package.json.template doesn't exist
+        .mockResolvedValueOnce(true);  // eslint.config.js exists (React template has this)
 
       const config: ProjectConfig = {
         name: 'js-web',
