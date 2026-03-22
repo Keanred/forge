@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import path from 'node:path';
 import { initGit } from './post-scaffold.js';
 import { resolvePath } from './scaffold.js';
 import { validateProjectName } from './utils/validate.js';
+import { promptUser } from 'prompts.js';
 
 const program = new Command();
 
@@ -12,12 +14,18 @@ const main = async () => {
   program
     .command('init <projectName>')
     .description('Initialize a new Forge project')
+    .option('--template <template>', 'Template to use')
+    .option('--no-typescript', 'Disable typescript')
+    .option('--testing', 'Include testing setup')
+    .option('--pm <npm|yarn|pnpm', 'Which package manager to use')
+    .option('--no-git', 'Disable version control')
+    .option('--version <version>', 'Which version the project is')
     .action(async (projectName: string) => {
       await validateProjectName(projectName);
       await resolvePath(projectName);
-      const path = (await import('node:path')).default;
+      await promptUser(program.opts());
       const destDir = path.resolve(process.cwd(), projectName);
-      await initGit(destDir);
+      initGit(destDir);
     });
 
   await program.parseAsync(process.argv);

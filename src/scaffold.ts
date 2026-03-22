@@ -2,7 +2,6 @@ import fs from 'fs-extra';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// ESM-compatible __dirname
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const resolvePath = async (projectName?: string) => {
@@ -25,9 +24,10 @@ export const resolvePath = async (projectName?: string) => {
     },
   });
 
+  const pkgTemplatePath = path.join(destDir, 'package.json.template');
   const pkgPath = path.join(destDir, 'package.json');
-  if (await fs.pathExists(pkgPath)) {
-    let pkgContent = await fs.readFile(pkgPath, 'utf8');
+  if (await fs.pathExists(pkgTemplatePath)) {
+    let pkgContent = await fs.readFile(pkgTemplatePath, 'utf8');
     pkgContent = pkgContent.replace(/\{\{project-name\}\}/g, projectName);
     await fs.writeFile(pkgPath, pkgContent, 'utf8');
   }

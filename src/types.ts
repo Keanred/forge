@@ -1,10 +1,10 @@
 type Template = 'react' | 'express' | 'fullstack';
+type PackageManager = 'npm' | 'yarn' | 'pnpm';
 
-interface ProjectConfig {
+export interface ProjectConfig {
   name: string;
   template: Template;
   typescript: boolean;
-  packageManager: 'npm' | 'yarn' | 'pnpm';
+  packageManager: PackageManager;
   git: boolean;
-  version: string;
 }
