@@ -1,0 +1,39 @@
+import { CreateItemInput, ItemResponse, UpdateItemInput } from '@{{PROJECT_NAME}}/schemas';
+import { dbDeleteItem, dbGetItemById, dbGetItems, dbInsertItem, dbUpdateItem } from '../db/queries/items';
+import { InternalServerError, NotFoundError } from '../errors/http';
+
+export const getItems = async (): Promise<ItemResponse[]> => {
+  return await dbGetItems();
+};
+
+export const getItemById = async (id: string): Promise<ItemResponse> => {
+  const item = await dbGetItemById(id);
+  if (!item) {
+    throw new NotFoundError(`Item ${id} not found`);
+  }
+  return item;
+};
+
+export const createItem = async (input: CreateItemInput): Promise<ItemResponse> => {
+  return await dbInsertItem(input);
+};
+
+export const updateItem = async (id: string, input: UpdateItemInput): Promise<ItemResponse> => {
+  const existing = await dbGetItemById(id);
+  if (!existing) {
+    throw new NotFoundError(`Item ${id} not found`);
+  }
+  const updated = await dbUpdateItem(id, input);
+  if (!updated) {
+    throw new InternalServerError(`Failed to update item ${id}`);
+  }
+  return updated;
+};
+
+export const deleteItem = async (id: string): Promise<void> => {
+  const existing = await dbGetItemById(id);
+  if (!existing) {
+    throw new NotFoundError(`Item ${id} not found`);
+  }
+  await dbDeleteItem(id);
+};

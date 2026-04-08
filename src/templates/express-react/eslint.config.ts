@@ -1,18 +1,30 @@
-import tseslint from 'typescript-eslint';
 import prettier from 'eslint-plugin-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import tseslint from 'typescript-eslint';
+
+const tsconfigRootDir = path.dirname(fileURLToPath(import.meta.url));
+const projectTsconfigs = [
+  './server/tsconfig.json',
+  './server/tsconfig.node.json',
+  './client/tsconfig.json',
+  './client/tsconfig.node.json',
+  './schemas/tsconfig.json',
+];
 
 export default defineConfig([
-  globalIgnores(['**/*.js', 'node_modules', 'dist']),
+  globalIgnores(['**/*.js', 'node_modules', '**/dist/**', '**/coverage/**']),
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    files: ['server/**/*.ts', 'client/**/*.ts', 'client/**/*.tsx', 'schemas/**/*.ts'],
     plugins: {
       prettier,
     },
     extends: [...tseslint.configs.recommended],
     languageOptions: {
       parserOptions: {
-        project: './tsconfig.json',
+        project: projectTsconfigs,
+        tsconfigRootDir,
         sourceType: 'module',
       },
       globals: {
@@ -40,7 +52,8 @@ export default defineConfig([
       'no-global-assign': 'error',
       'no-invalid-regexp': 'error',
       'no-octal': 'error',
-      'no-redeclare': 'error',
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': ['error', { ignoreDeclarationMerge: true }],
       'no-self-assign': 'error',
       'no-shadow-restricted-names': 'error',
       'no-unused-labels': 'error',

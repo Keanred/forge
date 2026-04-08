@@ -1,0 +1,44 @@
+import { CreateItemInput, UpdateItemInput } from '@{{PROJECT_NAME}}/schemas';
+import { Request, Response, Router } from 'express';
+import { BadRequestError } from '../errors/http';
+import { createItem, deleteItem, getItemById, getItems, updateItem } from '../services/items';
+
+const itemsRouter = Router();
+
+itemsRouter.get('/items', async (_req: Request, res: Response): Promise<void> => {
+  const result = await getItems();
+  res.status(200).json({ success: true, data: result });
+});
+
+itemsRouter.get('/items/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const item = await getItemById(id);
+  res.status(200).json({ success: true, data: item });
+});
+
+itemsRouter.post('/items', async (req: Request, res: Response): Promise<void> => {
+  const result = CreateItemInput.safeParse(req.body);
+  if (!result.success) {
+    throw new BadRequestError(JSON.stringify(result.error.flatten()));
+  }
+  const newItem = await createItem(result.data);
+  res.status(201).json({ success: true, data: newItem });
+});
+
+itemsRouter.patch('/items/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const result = UpdateItemInput.safeParse(req.body);
+  if (!result.success) {
+    throw new BadRequestError(JSON.stringify(result.error.flatten()));
+  }
+  const updated = await updateItem(id, result.data);
+  res.status(200).json({ success: true, data: updated });
+});
+
+itemsRouter.delete('/items/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  await deleteItem(id);
+  res.status(200).json({ success: true, data: { message: `Item ${id} deleted` } });
+});
+
+export default itemsRouter;

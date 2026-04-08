@@ -1,0 +1,36 @@
+node_modules/
+dist/
+build/
+.DS_Store
+*.log
+.env
+.env.local
+.env.dev
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.turbo/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Coverage
+coverage
+*.lcov
+.nyc_output
+
+# TypeScript cache
+*.tsbuildinfo
+
+# dotenv files
+.env
+.env.*
+!.env.example
+
+# Build outputs
+out
+.next
+.nuxt
+dist

@@ -26,7 +26,7 @@ export const promptUser = async (defaults: any) => {
       name: 'template',
       message: 'Project template:',
       when: () => !mappedDefaults.template,
-      choices: ['react', 'express', 'fullstack'],
+      choices: ['react', 'express', 'express-react'],
       default: 'express',
     },
     {

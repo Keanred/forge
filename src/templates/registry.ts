@@ -15,7 +15,7 @@ export const getTemplates = (template: string): TemplateMeta => {
         id: 'express',
         name: 'Express',
         description: 'A minimal and flexible Node.js web application framework.',
-        dirPath: 'express',
+        dirPath: 'templates/express',
         supportedOptions: ['typescript', 'testing', 'packageManager', 'git'],
       };
     case 'react':
@@ -23,7 +23,7 @@ export const getTemplates = (template: string): TemplateMeta => {
         id: 'react',
         name: 'React',
         description: 'A JavaScript library for building user interfaces.',
-        dirPath: 'react',
+        dirPath: 'templates/react',
         supportedOptions: ['typescript', 'testing', 'packageManager', 'git'],
       };
     case 'express-react':
@@ -31,7 +31,7 @@ export const getTemplates = (template: string): TemplateMeta => {
         id: 'express-react',
         name: 'Express + React',
         description: 'A full-stack template combining Express and React.',
-        dirPath: 'express-react',
+        dirPath: 'templates/express-react',
         supportedOptions: ['typescript', 'testing', 'packageManager', 'git'],
       };
     default:

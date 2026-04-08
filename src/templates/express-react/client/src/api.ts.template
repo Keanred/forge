@@ -1,0 +1,52 @@
+import type { CreateItemInput, ItemResponse, UpdateItemInput } from '@{{PROJECT_NAME}}/schemas';
+
+const API_BASE = '/api';
+
+type ApiSuccess<TData> = { success: true; data: TData };
+type ApiFailure = { success: false; error: unknown };
+type ApiResponse<TData> = ApiSuccess<TData> | ApiFailure;
+
+export class ApiClientError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiClientError';
+    this.status = status;
+  }
+}
+
+const request = async <TResponse, TBody = unknown>(
+  path: string,
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
+  body?: TBody,
+): Promise<TResponse> => {
+  const headers: HeadersInit = {};
+  const init: RequestInit = { method, headers };
+
+  if (body !== undefined) {
+    (headers as Record<string, string>)['Content-Type'] = 'application/json';
+    init.body = JSON.stringify(body);
+  }
+
+  const res = await fetch(`${API_BASE}${path}`, init);
+  const payload = (await res.json()) as ApiResponse<TResponse>;
+
+  if (!res.ok || !payload.success) {
+    throw new ApiClientError(`Request failed with status ${res.status}`, res.status);
+  }
+
+  return payload.data;
+};
+
+export const getItems = (): Promise<ItemResponse[]> => request<ItemResponse[]>('/items');
+
+export const getItem = (id: string): Promise<ItemResponse> => request<ItemResponse>(`/items/${id}`);
+
+export const createItem = (input: CreateItemInput): Promise<ItemResponse> =>
+  request<ItemResponse, CreateItemInput>('/items', 'POST', input);
+
+export const updateItem = (id: string, input: UpdateItemInput): Promise<ItemResponse> =>
+  request<ItemResponse, UpdateItemInput>(`/items/${id}`, 'PATCH', input);
+
+export const deleteItem = (id: string): Promise<void> => request<void>(`/items/${id}`, 'DELETE');

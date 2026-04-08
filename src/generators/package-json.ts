@@ -106,17 +106,26 @@ const generateExpressReactPackageJson = (config: ProjectConfig): PackageJson => 
 
   return {
     name,
-    version: '1.0.0',
-    workspaces: ['client', 'server'],
-    scripts: {
-      dev: 'npm-run-all --parallel dev:client dev:server',
-      'dev:client': 'npm --workspace client run dev',
-      'dev:server': 'npm --workspace server run dev',
-    },
-    keywords: [],
-    author: '',
-    license: 'ISC',
+    version: '0.0.1',
     description: '',
+    private: true,
+    workspaces: ['server', 'client', 'schemas'],
+    scripts: {
+      build:
+        'npm run build --workspace=schemas && npm run build --workspace=server && npm run build --workspace=client',
+      lint: 'eslint client server schemas --max-warnings 0',
+      format: 'prettier . --write',
+    },
+    devDependencies: {
+      jiti: '^2.4.2',
+      'prettier-plugin-organize-imports': '^4.3.0',
+      'typescript-eslint': '^8.46.1',
+    },
+    dependencies: {
+      eslint: '^10.1.0',
+      'eslint-plugin-prettier': '^5.5.5',
+      prettier: '^3.8.1',
+    },
   };
 };
 

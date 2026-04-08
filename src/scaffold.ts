@@ -26,7 +26,8 @@ export const resolvePath = async (projectConfig: ProjectConfig) => {
   await fs.copy(templateDir, destDir, {
     overwrite: false,
     filter: (src) => {
-      if (src.includes('node_modules') || src.includes('.git')) {
+      const normalized = src.replace(/\\/g, '/');
+      if (/(^|\/)(node_modules|\.git)(\/|$)/.test(normalized)) {
         return false;
       }
       return true;

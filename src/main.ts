@@ -21,8 +21,7 @@ const main = async () => {
     .option('--pm <npm|yarn|pnpm', 'Which package manager to use')
     .option('--no-git', 'Disable version control')
     .option('--version <version>', 'Which version the project is')
-    .action(async () => {
-      const opts = program.opts();
+    .action(async (opts) => {
       const projectSettings = await promptUser(opts);
       await validateProjectName(projectSettings.name);
       await resolvePath(projectSettings);

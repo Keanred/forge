@@ -1,18 +1,29 @@
-import express from 'express';
-import http from 'http';
-import cors from 'cors';
-import helloRouter from './routes/hello';
+import app from './app';
+import { config } from './config';
+import { disconnectDb } from './db/client';
 
-const app = express();
-const port = process.env.PORT || 8080;
+let isShuttingDown = false;
 
-app.use(cors());
-app.use(express.json());
+const gracefulShutdown = (server: ReturnType<typeof app.listen>) => async (): Promise<void> => {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
 
-app.use('/api/hello', helloRouter);
+  console.log('Shutdown signal received, shutting down gracefully...');
 
-const server = http.createServer(app);
+  await disconnectDb();
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+};
 
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+const start = async (): Promise<void> => {
+  const server = app.listen(config.port, () => {
+    console.log(`Server listening on port ${config.port}`);
+  });
+
+  process.on('SIGTERM', gracefulShutdown(server));
+  process.on('SIGINT', gracefulShutdown(server));
+};
+
+void start();
